@@ -1,0 +1,26 @@
+services:
+  vk-turn-proxy:
+    image: ghcr.io/cacggghp/vk-turn-proxy:v1.8.3
+    container_name: vk_turn
+    restart: unless-stopped
+    ports:
+      - "56000:56000/udp"
+    environment:
+      - CONNECT_ADDR=wireguard:51820
+
+  wireguard:
+    image: linuxserver/wireguard:1.0.20260223-r0-ls123
+    container_name: vk_wg
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - ./wg0.conf:/config/wg0.conf:ro
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Amsterdam

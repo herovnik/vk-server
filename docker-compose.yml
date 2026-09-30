@@ -1,12 +1,21 @@
 services:
   vk-turn-proxy:
-    image: ghcr.io/cacggghp/vk-turn-proxy:v1.8.3
+    image: ghcr.io/mysorez/vk-turn-proxy:v1.5.3
     container_name: vk_turn
     restart: unless-stopped
+    # ВАЖНО: штатный entrypoint образа игнорирует command и не умеет -wrap/-password.
+    # Переопределяем — запускаем бинарник сервера напрямую:
+    entrypoint: ["./vk-turn-proxy"]
+    command:
+      - "-listen"
+      - "0.0.0.0:56000"
+      - "-connect"
+      - "wireguard:51820"
+      - "-wrap"
+      - "-password"
+      - "lD3nYnYYgE0YYrqJF1E6W9Ss"
     ports:
       - "56000:56000/udp"
-    environment:
-      - CONNECT_ADDR=wireguard:51820
 
   wireguard:
     image: linuxserver/wireguard:1.0.20260223-r0-ls123
